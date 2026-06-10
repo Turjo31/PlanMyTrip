@@ -35,3 +35,11 @@ Route::get('/trips/create', function () {
 Route::get('/trips/1', function () {
     return view('trips.show');
 });
+
+Route::get('/trips', function () {
+    return view('trips.index');
+});
+
+Route::get('/trips/1/edit', function () {
+    return view('trips.edit');
+});
