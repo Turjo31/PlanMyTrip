@@ -43,3 +43,19 @@ Route::get('/trips', function () {
 Route::get('/trips/1/edit', function () {
     return view('trips.edit');
 });
+
+Route::get('/announcements', function () {
+    return view('announcements.index');
+});
+
+Route::get('/admin', function () {
+    return view('admin.dashboard');
+});
+
+Route::get('/admin/users', function () {
+    return view('admin.users');
+});
+
+Route::get('/admin/announcements', function () {
+    return view('admin.announcements');
+});
