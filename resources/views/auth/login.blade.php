@@ -110,7 +110,7 @@
             </div>
         @endif
 
-        <form method="POST" action="#">
+        <form method="POST" action="{{ route('login') }}">
             @csrf
 
             <div class="mb-3">
@@ -140,7 +140,7 @@
         </form>
 
         <div class="auth-footer mt-3">
-            Don't have an account? <a href="#">Register here</a>
+            Don't have an account? <a href="{{ route('register') }}">Register here</a>
         </div>
     </div>
 </div>

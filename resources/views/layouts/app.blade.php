@@ -150,21 +150,39 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto ms-4">
                     @auth
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="#">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('trips*') ? 'active' : '' }}" href="#">My Trips</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {{ request()->is('announcements*') ? 'active' : '' }}" href="#">Announcements</a>
-                        </li>
+                        @if(Auth::user()->isAdmin())
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('admin') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}" href="{{ route('admin.users') }}">Users</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('admin/announcements*') ? 'active' : '' }}" href="{{ route('admin.announcements') }}">Announcements</a>
+                            </li>
+                        @else
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">Dashboard</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('trips*') ? 'active' : '' }}" href="{{ route('trips.index') }}">My Trips</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('community*') ? 'active' : '' }}" href="{{ route('community.index') }}">Community</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('announcements*') ? 'active' : '' }}" href="{{ route('announcements.index') }}">Announcements</a>
+                            </li>
+                        @endif
                     @else
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ url('/') }}">Home</a>
+                            <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ route('home') }}">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->is('announcements*') ? 'active' : '' }}" href="#">Announcements</a>
+                            <a class="nav-link {{ request()->is('community*') ? 'active' : '' }}" href="{{ route('community.index') }}">Community</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->is('announcements*') ? 'active' : '' }}" href="{{ route('announcements.index') }}">Announcements</a>
                         </li>
                     @endauth
                 </ul>
@@ -172,13 +190,13 @@
                 <div class="d-flex gap-2">
                     @auth
                         <span class="nav-link text-muted" style="font-size:14px;">Hi, {{ Auth::user()->name }}</span>
-                        <form method="POST" action="#">
+                        <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="btn btn-sm btn-outline-secondary">Logout</button>
                         </form>
                     @else
-                        <a href="#" class="btn btn-sm btn-outline-secondary">Login</a>
-                        <a href="#" class="btn btn-sm btn-orange">Register</a>
+                        <a href="{{ route('login') }}" class="btn btn-sm btn-outline-secondary">Login</a>
+                        <a href="{{ route('register') }}" class="btn btn-sm btn-orange">Register</a>
                     @endauth
                 </div>
             </div>
@@ -193,9 +211,9 @@
         <div class="container text-center">
             <div class="footer-logo mb-2">Plan<span>My</span>Trip</div>
             <div class="d-flex justify-content-center gap-4 mb-3">
-                <a href="{{ url('/') }}">Home</a>
-                <a href="#">Features</a>
-                <a href="#">Announcements</a>
+                <a href="{{ route('home') }}">Home</a>
+                <a href="{{ route('community.index') }}">Community</a>
+                <a href="{{ route('announcements.index') }}">Announcements</a>
             </div>
             <small style="font-size:12px;">© {{ date('Y') }} PlanMyTrip. All rights reserved.</small>
         </div>

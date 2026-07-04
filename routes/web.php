@@ -1,61 +1,78 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TripController;
+use App\Http\Controllers\PlaceController;
+use App\Http\Controllers\AnnouncementController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\AdminController;
 
+// ── Public Routes ──────────────────────────────────────────
 
+// Landing page
 Route::get('/', function () {
-    return view('welcome', ['announcements' => collect()]);
+    $announcements = \App\Models\Announcement::latest()->take(3)->get();
+    return view('welcome', compact('announcements'));
+})->name('home');
+
+// Community feed (public)
+Route::get('/community', [PostController::class, 'index'])->name('community.index');
+
+// Announcements (public)
+Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
+
+// ── Guest Only Routes ──────────────────────────────────────
+
+Route::middleware('guest')->group(function () {
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register']);
+
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
 });
 
-Route::get('/login', function () {
-    return view('auth.login');
+// ── Authenticated Routes ───────────────────────────────────
+
+Route::middleware('auth')->group(function () {
+
+    // Logout
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+    // Dashboard
+    Route::get('/dashboard', [TripController::class, 'dashboard'])->name('dashboard');
+
+    // Trips
+    Route::resource('trips', TripController::class);
+
+    // Places (nested under trips)
+    Route::post('/trips/{trip}/places', [PlaceController::class, 'store'])->name('places.store');
+    Route::put('/trips/{trip}/places/{place}', [PlaceController::class, 'update'])->name('places.update');
+    Route::delete('/trips/{trip}/places/{place}', [PlaceController::class, 'destroy'])->name('places.destroy');
+
+    // Community (create/store/delete — auth required)
+    Route::get('/community/create', [PostController::class, 'create'])->name('community.create');
+    Route::post('/community', [PostController::class, 'store'])->name('community.store');
+    Route::put('/community/{post}', [PostController::class, 'update'])->name('community.update');
+    Route::delete('/community/{post}', [PostController::class, 'destroy'])->name('community.destroy');
+
 });
 
-Route::get('/register', function () {
-    return view('auth.register');
-});
+// ── Admin Routes ───────────────────────────────────────────
 
-Route::get('/dashboard', function () {
-    return view('dashboard', [
-        'totalTrips'   => 0,
-        'upcomingCount'=> 0,
-        'totalBudget'  => 0,
-        'trips'        => collect(),
-        'weatherTrip'  => null,
-        'weatherIcon'  => 'sun',
-        'weatherTemp'  => null,
-        'weatherDesc'  => null,
-    ]);
-});
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
-Route::get('/trips/create', function () {
-    return view('trips.create');
-});
+    // Admin dashboard
+    Route::get('/', [AdminController::class, 'dashboard'])->name('admin.dashboard');
 
-Route::get('/trips/1', function () {
-    return view('trips.show');
-});
+    // Manage users
+    Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
+    Route::patch('/users/{user}/toggle', [AdminController::class, 'toggleUser'])->name('admin.users.toggle');
 
-Route::get('/trips', function () {
-    return view('trips.index');
-});
+    // Manage announcements
+    Route::get('/announcements', [AdminController::class, 'announcements'])->name('admin.announcements');
+    Route::post('/announcements', [AnnouncementController::class, 'store'])->name('admin.announcements.store');
+    Route::put('/announcements/{announcement}', [AnnouncementController::class, 'update'])->name('admin.announcements.update');
+    Route::delete('/announcements/{announcement}', [AnnouncementController::class, 'destroy'])->name('admin.announcements.destroy');
 
-Route::get('/trips/1/edit', function () {
-    return view('trips.edit');
-});
-
-Route::get('/announcements', function () {
-    return view('announcements.index');
-});
-
-Route::get('/admin', function () {
-    return view('admin.dashboard');
-});
-
-Route::get('/admin/users', function () {
-    return view('admin.users');
-});
-
-Route::get('/admin/announcements', function () {
-    return view('admin.announcements');
 });

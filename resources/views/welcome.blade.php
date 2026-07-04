@@ -130,7 +130,7 @@
         <h1>Plan your next<br><span>adventure</span></h1>
         <p class="mt-3">Organize trips, track your budget, and explore destinations — all in one place. Built for travelers who love to plan.</p>
         <div class="d-flex justify-content-center gap-3">
-            <a href="#" class="btn btn-orange px-4 py-2">Get started — it's free</a>
+            <a href="{{ route('register') }}" class="btn btn-orange px-4 py-2">Get started — it's free</a>
             <a href="#features" class="btn btn-outline-secondary px-4 py-2">Learn more</a>
         </div>
         <div class="hero-stats">
