@@ -38,8 +38,57 @@
         gap: 4px;
     }
 
-    /* ── Info Row ── */
-    .info-row {
+    /* ── Loading Spinner ── */
+    .spinner {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        border: 2px solid #e0d9ce;
+        border-top-color: #EF9F27;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        vertical-align: middle;
+        margin-right: 6px;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+        font-size: 13px;
+        color: #aaa;
+        display: flex;
+        align-items: center;
+    }
+
+    /* ── Tourist Places ── */
+    .places-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 4px;
+    }
+
+    .tourist-place {
+        background: #f5f0e8;
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+
+    .tourist-place .place-name {
+        font-weight: 500;
+        color: #1a1a1a;
+        margin-bottom: 2px;
+        font-size: 13px;
+    }
+
+    .tourist-place .place-kind {
+        font-size: 11px;
+        color: #aaa;
+        text-transform: capitalize;
+    }
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 12px;
@@ -291,32 +340,19 @@
     {{-- Info Row: Weather + Destination --}}
     <div class="info-row">
 
-        {{-- Weather --}}
+        {{-- Weather -- loaded async via JS --}}
         <div class="info-card">
             <div class="card-label">
                 <i class="ti ti-cloud"></i> Live weather
             </div>
-            @if($weather)
-                <div class="weather-content">
-                    <div class="weather-left">
-                        @php
-                            $desc = $weather['weather'][0]['description'] ?? '';
-                            $icon = str_contains($desc, 'rain') ? 'cloud-rain' : (str_contains($desc, 'cloud') ? 'cloud' : 'sun');
-                        @endphp
-                        <i class="ti ti-{{ $icon }} weather-icon"></i>
-                        <div>
-                            <div class="weather-city">{{ $trip->destination }}</div>
-                            <div class="weather-desc">{{ ucfirst($desc) }}, feels like {{ round($weather['main']['feels_like']) }}°C</div>
-                        </div>
-                    </div>
-                    <div class="weather-temp">{{ round($weather['main']['temp']) }}°C</div>
+            <div id="weatherContent">
+                <div class="loading-text">
+                    <span class="spinner"></span> Fetching weather...
                 </div>
-            @else
-                <div style="font-size:13px; color:#aaa;">Weather data unavailable.</div>
-            @endif
+            </div>
         </div>
 
-        {{-- Destination Info --}}
+        {{-- Destination Info -- loaded async via JS --}}
         <div class="info-card">
             <div class="card-label">
                 <i class="ti ti-world"></i> Destination info
@@ -345,6 +381,18 @@
             @endif
         </div>
 
+    </div>
+
+    {{-- Tourist Places -- loaded async via JS --}}
+    <div class="info-card mb-4">
+        <div class="card-label">
+            <i class="ti ti-building-monument"></i> Tourist attractions nearby
+        </div>
+        <div id="touristPlaces">
+            <div class="loading-text">
+                <span class="spinner"></span> Finding nearby attractions...
+            </div>
+        </div>
     </div>
 
     {{-- Budget Summary --}}
@@ -434,4 +482,91 @@
     @endforelse
 
 </div>
+
+@section('scripts')
+<script>
+    // ── Trip destination passed from Blade to JS ──
+    const destination = "{{ $trip->destination }}";
+
+    /**
+     * Fetch live weather for the trip destination asynchronously.
+     * Updates the #weatherContent div with real data or an error message.
+     */
+    async function loadWeather() {
+        try {
+            const response = await fetch(`/api/weather?city=${encodeURIComponent(destination)}`);
+            const data = await response.json();
+
+            if (!response.ok) throw new Error(data.error || 'Failed to load weather');
+
+            // Pick icon based on weather description
+            const desc = data.desc.toLowerCase();
+            let icon = 'sun';
+            if (desc.includes('rain') || desc.includes('drizzle')) icon = 'cloud-rain';
+            else if (desc.includes('cloud')) icon = 'cloud';
+            else if (desc.includes('snow')) icon = 'snowflake';
+            else if (desc.includes('thunder')) icon = 'storm';
+
+            // Inject weather HTML into the page
+            document.getElementById('weatherContent').innerHTML = `
+                <div class="weather-content">
+                    <div class="weather-left">
+                        <i class="ti ti-${icon} weather-icon"></i>
+                        <div>
+                            <div class="weather-city">${destination}</div>
+                            <div class="weather-desc">${data.desc}, feels like ${data.feels_like}°C</div>
+                        </div>
+                    </div>
+                    <div class="weather-temp">${data.temp}°C</div>
+                </div>
+            `;
+        } catch (error) {
+            document.getElementById('weatherContent').innerHTML =
+                `<div style="font-size:13px; color:#aaa;">Weather data unavailable.</div>`;
+        }
+    }
+
+    /**
+     * Fetch tourist attractions near the trip destination asynchronously.
+     * Updates the #touristPlaces div with a grid of nearby places.
+     */
+    async function loadTouristPlaces() {
+        try {
+            const response = await fetch(`/api/places?city=${encodeURIComponent(destination)}`);
+            const places = await response.json();
+
+            if (!response.ok || places.length === 0) throw new Error('No places found');
+
+            // Build a grid of tourist place cards
+            const html = `
+                <div class="places-grid">
+                    ${places.map(place => `
+                        <div class="tourist-place">
+                            <div class="place-name">
+                                <i class="ti ti-map-pin" style="font-size:12px; color:#EF9F27;"></i>
+                                ${place.name}
+                            </div>
+                            <div class="place-kind">${place.category}${place.address ? ' · ' + place.address : ''}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            document.getElementById('touristPlaces').innerHTML = html;
+        } catch (error) {
+            document.getElementById('touristPlaces').innerHTML =
+                `<div style="font-size:13px; color:#aaa;">Tourist attractions unavailable for this destination.</div>`;
+        }
+    }
+
+    // ── Run both fetches in parallel when the page loads ──
+    // Uses Promise.all so both requests run simultaneously (two threads concept)
+    document.addEventListener('DOMContentLoaded', async () => {
+        await Promise.all([
+            loadWeather(),
+            loadTouristPlaces()
+        ]);
+    });
+</script>
+@endsection
 @endsection

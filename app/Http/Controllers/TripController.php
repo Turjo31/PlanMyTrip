@@ -68,22 +68,8 @@ class TripController extends Controller
         $remaining = $trip->budget - $totalEstimatedCost;
         $budgetPercent = $trip->budget > 0 ? min(100, round(($totalEstimatedCost / $trip->budget) * 100)) : 0;
 
-        // Fetch weather from OpenWeatherMap
-        $weather = null;
-        try {
-            $weatherResponse = Http::get('https://api.openweathermap.org/data/2.5/weather', [
-                'q'     => $trip->destination,
-                'appid' => env('OPENWEATHER_API_KEY'),
-                'units' => 'metric',
-            ]);
-            if ($weatherResponse->ok()) {
-                $weather = $weatherResponse->json();
-            }
-        } catch (\Exception $e) {
-            $weather = null;
-        }
-
-        // Fetch country info from RestCountries
+        // Fetch country info from RestCountries API (PHP side)
+        // Weather and tourist places are fetched client-side via async JavaScript
         $countryInfo = null;
         try {
             $countryResponse = Http::get('https://restcountries.com/v3.1/name/' . urlencode($trip->destination));
@@ -100,7 +86,6 @@ class TripController extends Controller
             'totalEstimatedCost',
             'remaining',
             'budgetPercent',
-            'weather',
             'countryInfo'
         ));
     }
