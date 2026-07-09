@@ -12,7 +12,13 @@ class TripController extends Controller
     // Show all trips for the logged in user
     public function index()
     {
-        $trips = Trip::where('user_id', Auth::id())->latest()->get();
+        $query = Trip::where('user_id', Auth::id())->latest();
+
+        if (request('status')) {
+            $query->where('status', request('status'));
+        }
+
+        $trips = $query->get();
         return view('trips.index', compact('trips'));
     }
 

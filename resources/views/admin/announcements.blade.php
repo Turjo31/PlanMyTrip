@@ -175,7 +175,12 @@
     {{-- New Announcement Form --}}
     <div class="form-card">
         <h5>New Announcement</h5>
-        <form method="POST" action="#">
+
+        @if(session('success'))
+            <div class="alert alert-success mb-3" style="font-size:13px; border-radius:8px;">{{ session('success') }}</div>
+        @endif
+
+        <form method="POST" action="{{ route('admin.announcements.store') }}">
             @csrf
             <div class="mb-3">
                 <label class="form-label">Title</label>
@@ -184,6 +189,7 @@
                     name="title"
                     class="form-control"
                     placeholder="e.g. New feature released"
+                    value="{{ old('title') }}"
                     required
                 >
             </div>
@@ -195,7 +201,7 @@
                     rows="3"
                     placeholder="Write the announcement details..."
                     required
-                ></textarea>
+                >{{ old('body') }}</textarea>
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn btn-orange px-4">Post announcement</button>
@@ -208,48 +214,32 @@
         <h5>Posted announcements</h5>
     </div>
 
-    <div class="ann-item">
-        <div>
-            <div class="ann-title">Weather feature is now live</div>
-            <p class="ann-body">You can now see real-time weather for any destination directly on your trip details page.</p>
-            <div class="ann-actions">
-                <button class="icon-btn"><i class="ti ti-edit"></i></button>
-                <form method="POST" action="#" style="display:inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="icon-btn" style="color:#e74c3c;"><i class="ti ti-trash"></i></button>
-                </form>
+    @forelse($announcements as $announcement)
+        <div class="ann-item">
+            <div>
+                <div class="ann-title">{{ $announcement->title }}</div>
+                <p class="ann-body">{{ $announcement->body }}</p>
+                <div class="ann-actions">
+                    <form method="POST" action="{{ route('admin.announcements.destroy', $announcement) }}" style="display:inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="icon-btn" style="color:#e74c3c;" onclick="return confirm('Delete this announcement?')">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                    </form>
+                </div>
             </div>
+            <div class="ann-date">{{ $announcement->created_at->format('M d, Y') }}</div>
         </div>
-        <div class="ann-date">Jun 5, 2026</div>
-    </div>
-
-    <div class="ann-item">
-        <div>
-            <div class="ann-title">Budget tracking update</div>
-            <p class="ann-body">Track your actual vs estimated costs for every place you plan to visit.</p>
-            <div class="ann-actions">
-                <button class="icon-btn"><i class="ti ti-edit"></i></button>
-                <form method="POST" action="#" style="display:inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="icon-btn" style="color:#e74c3c;"><i class="ti ti-trash"></i></button>
-                </form>
-            </div>
+    @empty
+        <div class="empty-state">
+            <i class="ti ti-speakerphone"></i>
+            No announcements posted yet.
         </div>
-        <div class="ann-date">May 28, 2026</div>
-    </div>
+    @endforelse
 
-    <div class="ann-item">
-        <div>
-            <div class="ann-title">Welcome to PlanMyTrip</div>
-            <p class="ann-body">We're officially live! Start planning your trips and exploring destinations.</p>
-            <div class="ann-actions">
-                <button class="icon-btn"><i class="ti ti-edit"></i></button>
-                <form method="POST" action="#" style="display:inline;">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="icon-btn" style="color:#e74c3c;"><i class="ti ti-trash"></i></button>
+</div>
+@endsection
                 </form>
             </div>
         </div>

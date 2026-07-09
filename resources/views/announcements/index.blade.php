@@ -87,30 +87,21 @@
         <p>Stay up to date with the latest news and site updates</p>
     </div>
 
-    {{-- Announcement List -- replace with @forelse($announcements as $announcement) when controller is ready --}}
-    <div class="ann-item">
-        <div>
-            <div class="ann-title">Weather feature is now live</div>
-            <p class="ann-body">You can now see real-time weather for any destination directly on your trip details page. Powered by live weather data.</p>
+    {{-- Announcement List --}}
+    @forelse($announcements as $announcement)
+        <div class="ann-item">
+            <div>
+                <div class="ann-title">{{ $announcement->title }}</div>
+                <p class="ann-body">{{ $announcement->body }}</p>
+            </div>
+            <div class="ann-date">{{ $announcement->created_at->format('M d, Y') }}</div>
         </div>
-        <div class="ann-date">Jun 5, 2026</div>
-    </div>
-
-    <div class="ann-item">
-        <div>
-            <div class="ann-title">Budget tracking update</div>
-            <p class="ann-body">Track your actual vs estimated costs for every place you plan to visit. The budget summary is now visible on each trip's details page.</p>
+    @empty
+        <div class="empty-state">
+            <i class="ti ti-speakerphone"></i>
+            No announcements yet. Check back soon!
         </div>
-        <div class="ann-date">May 28, 2026</div>
-    </div>
-
-    <div class="ann-item">
-        <div>
-            <div class="ann-title">Welcome to PlanMyTrip</div>
-            <p class="ann-body">We're officially live! Start planning your trips, exploring destinations, and tracking your travel budget — all in one place.</p>
-        </div>
-        <div class="ann-date">May 20, 2026</div>
-    </div>
+    @endforelse
 
 </div>
 @endsection

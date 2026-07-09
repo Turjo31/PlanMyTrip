@@ -146,74 +146,57 @@
             <h2>Community</h2>
             <p>See what fellow travelers are sharing</p>
         </div>
-        <a href="#" class="btn btn-orange px-4 py-2 mt-2">
-            <i class="ti ti-plus me-1"></i> Share a story
-        </a>
+        @auth
+            <a href="{{ route('community.create') }}" class="btn btn-orange px-4 py-2 mt-2">
+                <i class="ti ti-plus me-1"></i> Share a story
+            </a>
+        @endauth
     </div>
 
-    {{-- Posts -- replace with @forelse($posts as $post) when controller is ready --}}
-    <div class="post-card">
-        <div class="post-meta">
-            <div class="post-avatar">R</div>
-            <div>
-                <div class="post-author">Rahim Uddin</div>
-                <div class="post-date">Jun 10, 2026</div>
-            </div>
-        </div>
-        <div class="post-title">Cox's Bazar was absolutely worth it!</div>
-        <p class="post-body">Just got back from a 3-day trip to Cox's Bazar and it was one of the best experiences of my life. The beach at sunrise is something else entirely. Highly recommend staying near Inani Beach — much less crowded than the main beach.</p>
-        <div class="post-footer">
-            <div class="post-destination">
-                <i class="ti ti-map-pin" style="font-size:12px;"></i> Cox's Bazar, Bangladesh
-            </div>
-            <div class="post-actions">
-                <button class="icon-btn"><i class="ti ti-edit"></i></button>
-                <button class="icon-btn"><i class="ti ti-trash"></i></button>
-            </div>
-        </div>
-    </div>
+    {{-- Success message --}}
+    @if(session('success'))
+        <div class="alert alert-success mb-3" style="font-size:13px; border-radius:8px;">{{ session('success') }}</div>
+    @endif
 
-    <div class="post-card">
-        <div class="post-meta">
-            <div class="post-avatar">K</div>
-            <div>
-                <div class="post-author">Karim Hossain</div>
-                <div class="post-date">Jun 5, 2026</div>
+    {{-- Posts --}}
+    @forelse($posts as $post)
+        <div class="post-card">
+            <div class="post-meta">
+                <div class="post-avatar">{{ strtoupper(substr($post->user->name, 0, 1)) }}</div>
+                <div>
+                    <div class="post-author">{{ $post->user->name }}</div>
+                    <div class="post-date">{{ $post->created_at->format('M d, Y') }}</div>
+                </div>
+            </div>
+            <div class="post-title">{{ $post->title }}</div>
+            <p class="post-body">{{ $post->body }}</p>
+            <div class="post-footer">
+                @if($post->destination)
+                    <div class="post-destination">
+                        <i class="ti ti-map-pin" style="font-size:12px;"></i> {{ $post->destination }}
+                    </div>
+                @else
+                    <div></div>
+                @endif
+                @auth
+                    @if(Auth::id() === $post->user_id)
+                        <div class="post-actions">
+                            <form method="POST" action="{{ route('community.destroy', $post) }}" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="icon-btn" onclick="return confirm('Delete this post?')"><i class="ti ti-trash"></i></button>
+                            </form>
+                        </div>
+                    @endif
+                @endauth
             </div>
         </div>
-        <div class="post-title">Sylhet tea gardens — a hidden gem</div>
-        <p class="post-body">Visited the tea gardens in Sylhet last weekend. The views are stunning and the weather was perfect. If you're planning a trip, make sure to visit Ratargul Swamp Forest as well — it's only an hour away and completely magical.</p>
-        <div class="post-footer">
-            <div class="post-destination">
-                <i class="ti ti-map-pin" style="font-size:12px;"></i> Sylhet, Bangladesh
-            </div>
-            <div class="post-actions">
-                <button class="icon-btn"><i class="ti ti-edit"></i></button>
-                <button class="icon-btn"><i class="ti ti-trash"></i></button>
-            </div>
+    @empty
+        <div class="empty-state">
+            <i class="ti ti-writing"></i>
+            No stories yet. Be the first to share one!
         </div>
-    </div>
-
-    <div class="post-card">
-        <div class="post-meta">
-            <div class="post-avatar">N</div>
-            <div>
-                <div class="post-author">Nadia Islam</div>
-                <div class="post-date">May 30, 2026</div>
-            </div>
-        </div>
-        <div class="post-title">First time in the Sundarbans</div>
-        <p class="post-body">Did a day trip to the Sundarbans from Khulna and it was surreal. Spotted a deer and some crocodiles from the boat. The forest is incredibly dense and peaceful. Would love to go back for a longer stay.</p>
-        <div class="post-footer">
-            <div class="post-destination">
-                <i class="ti ti-map-pin" style="font-size:12px;"></i> Khulna, Bangladesh
-            </div>
-            <div class="post-actions">
-                <button class="icon-btn"><i class="ti ti-edit"></i></button>
-                <button class="icon-btn"><i class="ti ti-trash"></i></button>
-            </div>
-        </div>
-    </div>
+    @endforelse
 
 </div>
 @endsection

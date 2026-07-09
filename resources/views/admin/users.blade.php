@@ -155,9 +155,14 @@
         <p>View, activate, or deactivate user accounts</p>
     </div>
 
+    {{-- Success message --}}
+    @if(session('success'))
+        <div class="alert alert-success mb-3" style="font-size:13px; border-radius:8px;">{{ session('success') }}</div>
+    @endif
+
     {{-- Search --}}
     <div class="search-bar">
-        <input type="text" class="form-control" placeholder="Search by name or email...">
+        <input type="text" id="userSearch" class="form-control" placeholder="Search by name or email...">
     </div>
 
     {{-- Users Table --}}
@@ -173,66 +178,54 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>Rahim Uddin</td>
-                    <td>rahim@email.com</td>
-                    <td>6</td>
-                    <td>May 20, 2026</td>
-                    <td><span class="badge badge-active">Active</span></td>
-                    <td>
-                        <form method="POST" action="#" style="display:inline;">
-                            @csrf
-                            @method('PATCH')
-                            <button class="action-btn deactivate">Deactivate</button>
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Karim Hossain</td>
-                    <td>karim@email.com</td>
-                    <td>3</td>
-                    <td>May 25, 2026</td>
-                    <td><span class="badge badge-active">Active</span></td>
-                    <td>
-                        <form method="POST" action="#" style="display:inline;">
-                            @csrf
-                            @method('PATCH')
-                            <button class="action-btn deactivate">Deactivate</button>
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Nadia Islam</td>
-                    <td>nadia@email.com</td>
-                    <td>1</td>
-                    <td>Jun 1, 2026</td>
-                    <td><span class="badge badge-inactive">Inactive</span></td>
-                    <td>
-                        <form method="POST" action="#" style="display:inline;">
-                            @csrf
-                            @method('PATCH')
-                            <button class="action-btn activate">Activate</button>
-                        </form>
-                    </td>
-                </tr>
-                <tr>
-                    <td>Farhan Ahmed</td>
-                    <td>farhan@email.com</td>
-                    <td>4</td>
-                    <td>Jun 5, 2026</td>
-                    <td><span class="badge badge-active">Active</span></td>
-                    <td>
-                        <form method="POST" action="#" style="display:inline;">
-                            @csrf
-                            @method('PATCH')
-                            <button class="action-btn deactivate">Deactivate</button>
-                        </form>
-                    </td>
-                </tr>
+            <tbody id="usersTableBody">
+                @forelse($users as $user)
+                    <tr>
+                        <td>{{ $user->name }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>{{ $user->trips->count() }}</td>
+                        <td>{{ $user->created_at->format('M d, Y') }}</td>
+                        <td>
+                            @if($user->is_active)
+                                <span class="badge badge-active">Active</span>
+                            @else
+                                <span class="badge badge-inactive">Inactive</span>
+                            @endif
+                        </td>
+                        <td>
+                            <form method="POST" action="{{ route('admin.users.toggle', $user) }}" style="display:inline;">
+                                @csrf
+                                @method('PATCH')
+                                <button class="action-btn {{ $user->is_active ? 'deactivate' : 'activate' }}">
+                                    {{ $user->is_active ? 'Deactivate' : 'Activate' }}
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" style="text-align:center; color:#aaa; padding:2rem;">No users found.</td>
+                    </tr>
+                @endforelse
             </tbody>
         </table>
     </div>
 
 </div>
+
+@section('scripts')
+<script>
+    // Live search filter for users table
+    document.getElementById('userSearch').addEventListener('keyup', function () {
+        const query = this.value.toLowerCase();
+        const rows = document.querySelectorAll('#usersTableBody tr');
+
+        rows.forEach(row => {
+            const name = row.cells[0]?.textContent.toLowerCase() || '';
+            const email = row.cells[1]?.textContent.toLowerCase() || '';
+            row.style.display = (name.includes(query) || email.includes(query)) ? '' : 'none';
+        });
+    });
+</script>
+@endsection
 @endsection

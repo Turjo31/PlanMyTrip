@@ -97,7 +97,7 @@
     @endif
 
     <div class="form-card">
-        <form method="POST" action="#">
+        <form method="POST" action="{{ route('trips.update', $trip) }}">
             @csrf
             @method('PUT')
 
@@ -109,7 +109,7 @@
                     name="title"
                     class="form-control"
                     placeholder="e.g. Cox's Bazar Getaway"
-                    value="Cox's Bazar Getaway"
+                    value="{{ old('title', $trip->title) }}"
                     required
                 >
             </div>
@@ -122,7 +122,7 @@
                     name="destination"
                     class="form-control"
                     placeholder="e.g. Cox's Bazar, Bangladesh"
-                    value="Cox's Bazar, Bangladesh"
+                    value="{{ old('destination', $trip->destination) }}"
                     required
                 >
                 <div class="form-text mt-1">Weather and destination info will be fetched based on this.</div>
@@ -138,7 +138,7 @@
                         type="date"
                         name="start_date"
                         class="form-control"
-                        value="2026-06-15"
+                        value="{{ old('start_date', $trip->start_date) }}"
                         required
                     >
                 </div>
@@ -148,7 +148,7 @@
                         type="date"
                         name="end_date"
                         class="form-control"
-                        value="2026-06-18"
+                        value="{{ old('end_date', $trip->end_date) }}"
                         required
                     >
                 </div>
@@ -162,7 +162,7 @@
                     name="budget"
                     class="form-control"
                     placeholder="e.g. 12000"
-                    value="12000"
+                    value="{{ old('budget', $trip->budget) }}"
                     min="0"
                     required
                 >
@@ -172,9 +172,9 @@
             <div class="mb-3">
                 <label class="form-label">Status</label>
                 <select name="status" class="form-select">
-                    <option value="planned">Planned</option>
-                    <option value="ongoing" selected>Ongoing</option>
-                    <option value="completed">Completed</option>
+                    <option value="planned" {{ old('status', $trip->status) === 'planned' ? 'selected' : '' }}>Planned</option>
+                    <option value="ongoing" {{ old('status', $trip->status) === 'ongoing' ? 'selected' : '' }}>Ongoing</option>
+                    <option value="completed" {{ old('status', $trip->status) === 'completed' ? 'selected' : '' }}>Completed</option>
                 </select>
             </div>
 
@@ -186,11 +186,11 @@
                     class="form-control"
                     rows="3"
                     placeholder="Any extra details about this trip..."
-                >Visiting the main beach and Inani Beach.</textarea>
+                >{{ old('notes', $trip->notes) }}</textarea>
             </div>
 
             <div class="form-actions">
-                <a href="#" class="btn btn-outline-secondary px-4">Cancel</a>
+                <a href="{{ route('trips.show', $trip) }}" class="btn btn-outline-secondary px-4">Cancel</a>
                 <button type="submit" class="btn btn-orange px-4">Save changes</button>
             </div>
 

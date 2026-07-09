@@ -254,26 +254,39 @@
     <div class="details-header">
         <div>
             <p class="section-label mb-1">Trip details</p>
-            <h2>Cox's Bazar Getaway</h2>
+            <h2>{{ $trip->title }}</h2>
             <div class="meta">
-                <span><i class="ti ti-map-pin" style="font-size:13px;"></i> Cox's Bazar, Bangladesh</span>
-                <span><i class="ti ti-calendar" style="font-size:13px;"></i> Jun 15 – Jun 18, 2026</span>
-                <span><span class="badge badge-ongoing">Ongoing</span></span>
+                <span><i class="ti ti-map-pin" style="font-size:13px;"></i> {{ $trip->destination }}</span>
+                <span><i class="ti ti-calendar" style="font-size:13px;"></i> {{ \Carbon\Carbon::parse($trip->start_date)->format('M d') }} – {{ \Carbon\Carbon::parse($trip->end_date)->format('M d, Y') }}</span>
+                <span>
+                    @if($trip->status === 'ongoing')
+                        <span class="badge badge-ongoing">Ongoing</span>
+                    @elseif($trip->status === 'planned')
+                        <span class="badge badge-planned">Planned</span>
+                    @else
+                        <span class="badge badge-completed">Completed</span>
+                    @endif
+                </span>
             </div>
         </div>
         <div class="d-flex gap-2 mt-2">
-            <a href="#" class="btn btn-outline-secondary btn-sm px-3">
+            <a href="{{ route('trips.edit', $trip) }}" class="btn btn-outline-secondary btn-sm px-3">
                 <i class="ti ti-edit me-1"></i> Edit
             </a>
-            <form method="POST" action="#">
+            <form method="POST" action="{{ route('trips.destroy', $trip) }}">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn btn-sm btn-outline-secondary px-3" style="color:#e74c3c; border-color:#e74c3c;">
+                <button type="submit" class="btn btn-sm btn-outline-secondary px-3" style="color:#e74c3c; border-color:#e74c3c;" onclick="return confirm('Delete this trip?')">
                     <i class="ti ti-trash me-1"></i> Delete
                 </button>
             </form>
         </div>
     </div>
+
+    {{-- Success message --}}
+    @if(session('success'))
+        <div class="alert alert-success mb-3" style="font-size:13px; border-radius:8px;">{{ session('success') }}</div>
+    @endif
 
     {{-- Info Row: Weather + Destination --}}
     <div class="info-row">
@@ -283,16 +296,24 @@
             <div class="card-label">
                 <i class="ti ti-cloud"></i> Live weather
             </div>
-            <div class="weather-content">
-                <div class="weather-left">
-                    <i class="ti ti-sun weather-icon"></i>
-                    <div>
-                        <div class="weather-city">Cox's Bazar</div>
-                        <div class="weather-desc">Sunny, feels like 33°C</div>
+            @if($weather)
+                <div class="weather-content">
+                    <div class="weather-left">
+                        @php
+                            $desc = $weather['weather'][0]['description'] ?? '';
+                            $icon = str_contains($desc, 'rain') ? 'cloud-rain' : (str_contains($desc, 'cloud') ? 'cloud' : 'sun');
+                        @endphp
+                        <i class="ti ti-{{ $icon }} weather-icon"></i>
+                        <div>
+                            <div class="weather-city">{{ $trip->destination }}</div>
+                            <div class="weather-desc">{{ ucfirst($desc) }}, feels like {{ round($weather['main']['feels_like']) }}°C</div>
+                        </div>
                     </div>
+                    <div class="weather-temp">{{ round($weather['main']['temp']) }}°C</div>
                 </div>
-                <div class="weather-temp">31°C</div>
-            </div>
+            @else
+                <div style="font-size:13px; color:#aaa;">Weather data unavailable.</div>
+            @endif
         </div>
 
         {{-- Destination Info --}}
@@ -300,24 +321,28 @@
             <div class="card-label">
                 <i class="ti ti-world"></i> Destination info
             </div>
-            <div class="dest-grid">
-                <div class="dest-item">
-                    <div class="dest-label">Country</div>
-                    <div class="dest-val">Bangladesh</div>
+            @if($countryInfo)
+                <div class="dest-grid">
+                    <div class="dest-item">
+                        <div class="dest-label">Country</div>
+                        <div class="dest-val">{{ $countryInfo['name']['common'] ?? 'N/A' }}</div>
+                    </div>
+                    <div class="dest-item">
+                        <div class="dest-label">Currency</div>
+                        <div class="dest-val">{{ implode(', ', array_keys($countryInfo['currencies'] ?? [])) }}</div>
+                    </div>
+                    <div class="dest-item">
+                        <div class="dest-label">Language</div>
+                        <div class="dest-val">{{ implode(', ', array_slice(array_values($countryInfo['languages'] ?? []), 0, 2)) }}</div>
+                    </div>
+                    <div class="dest-item">
+                        <div class="dest-label">Timezone</div>
+                        <div class="dest-val">{{ $countryInfo['timezones'][0] ?? 'N/A' }}</div>
+                    </div>
                 </div>
-                <div class="dest-item">
-                    <div class="dest-label">Currency</div>
-                    <div class="dest-val">BDT (৳)</div>
-                </div>
-                <div class="dest-item">
-                    <div class="dest-label">Language</div>
-                    <div class="dest-val">Bengali</div>
-                </div>
-                <div class="dest-item">
-                    <div class="dest-label">Timezone</div>
-                    <div class="dest-val">UTC+6</div>
-                </div>
-            </div>
+            @else
+                <div style="font-size:13px; color:#aaa;">Destination info unavailable.</div>
+            @endif
         </div>
 
     </div>
@@ -329,71 +354,84 @@
         </div>
         <div class="budget-row">
             <span class="label">Total budget</span>
-            <span class="val">৳12,000</span>
+            <span class="val">৳{{ number_format($trip->budget) }}</span>
         </div>
         <div class="budget-row">
             <span class="label">Estimated cost (places)</span>
-            <span class="val">৳7,500</span>
+            <span class="val">৳{{ number_format($totalEstimatedCost) }}</span>
         </div>
         <div class="budget-row">
             <span class="label">Remaining</span>
-            <span class="val" style="color:#3B6D11;">৳4,500</span>
+            <span class="val" style="color:{{ $remaining >= 0 ? '#3B6D11' : '#e74c3c' }};">৳{{ number_format($remaining) }}</span>
         </div>
         <div class="progress">
-            <div class="progress-bar" style="width: 62%;"></div>
+            <div class="progress-bar" style="width: {{ $budgetPercent }}%;"></div>
         </div>
-        <div class="budget-note">62% of budget used across all places</div>
+        <div class="budget-note">{{ $budgetPercent }}% of budget used across all places</div>
     </div>
 
-    {{-- Places --}}
+    {{-- Add Place Form --}}
     <div class="section-header">
         <h5>Places to visit</h5>
-        <a href="#" class="btn btn-orange btn-sm px-3">
+        <button class="btn btn-orange btn-sm px-3" type="button" data-bs-toggle="collapse" data-bs-target="#addPlaceForm">
             <i class="ti ti-plus me-1"></i> Add place
-        </a>
+        </button>
     </div>
 
-    {{-- Place rows -- replace with @forelse($places as $place) when controller is ready --}}
-    <div class="place-row">
-        <div>
-            <div class="place-name">Sea Beach Hotel</div>
-            <div class="place-meta">
-                <span class="type-badge">Hotel</span>
-                <span>3 nights</span>
-            </div>
-        </div>
-        <div class="place-right">
-            <div class="place-cost">৳5,000</div>
-            <button class="icon-btn"><i class="ti ti-edit"></i></button>
-            <button class="icon-btn"><i class="ti ti-trash"></i></button>
-        </div>
-    </div>
-    <div class="place-row">
-        <div>
-            <div class="place-name">Boat ride at Inani Beach</div>
-            <div class="place-meta">
-                <span class="type-badge">Attraction</span>
-            </div>
-        </div>
-        <div class="place-right">
-            <div class="place-cost">৳500</div>
-            <button class="icon-btn"><i class="ti ti-edit"></i></button>
-            <button class="icon-btn"><i class="ti ti-trash"></i></button>
+    <div class="collapse mb-3" id="addPlaceForm">
+        <div class="info-card">
+            <form method="POST" action="{{ route('places.store', $trip) }}">
+                @csrf
+                <div class="row g-3">
+                    <div class="col-md-5">
+                        <input type="text" name="name" class="form-control" placeholder="Place name" required style="background:#f5f0e8; border:1px solid #e0d9ce; border-radius:8px; font-size:14px; padding:10px 14px;">
+                    </div>
+                    <div class="col-md-3">
+                        <select name="type" class="form-select" style="background:#f5f0e8; border:1px solid #e0d9ce; border-radius:8px; font-size:14px; padding:10px 14px;">
+                            <option value="hotel">Hotel</option>
+                            <option value="restaurant">Restaurant</option>
+                            <option value="attraction">Attraction</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <input type="number" name="estimated_cost" class="form-control" placeholder="Cost (৳)" min="0" required style="background:#f5f0e8; border:1px solid #e0d9ce; border-radius:8px; font-size:14px; padding:10px 14px;">
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-orange w-100">Add</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
-    <div class="place-row">
-        <div>
-            <div class="place-name">Local seafood restaurant</div>
-            <div class="place-meta">
-                <span class="type-badge">Restaurant</span>
+
+    {{-- Places List --}}
+    @forelse($places as $place)
+        <div class="place-row">
+            <div>
+                <div class="place-name">{{ $place->name }}</div>
+                <div class="place-meta">
+                    <span class="type-badge">{{ ucfirst($place->type) }}</span>
+                    @if($place->notes)
+                        <span>{{ $place->notes }}</span>
+                    @endif
+                </div>
+            </div>
+            <div class="place-right">
+                <div class="place-cost">৳{{ number_format($place->estimated_cost) }}</div>
+                <form method="POST" action="{{ route('places.destroy', [$trip, $place]) }}" style="display:inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="icon-btn" onclick="return confirm('Delete this place?')"><i class="ti ti-trash"></i></button>
+                </form>
             </div>
         </div>
-        <div class="place-right">
-            <div class="place-cost">৳2,000</div>
-            <button class="icon-btn"><i class="ti ti-edit"></i></button>
-            <button class="icon-btn"><i class="ti ti-trash"></i></button>
+    @empty
+        <div class="empty-state">
+            <i class="ti ti-map-off"></i>
+            No places added yet. Add your first one above!
         </div>
-    </div>
+    @endforelse
 
 </div>
 @endsection

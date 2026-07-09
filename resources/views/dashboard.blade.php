@@ -209,10 +209,10 @@
     <div class="dash-header">
         <div>
             <p class="section-label mb-1">Your travel hub</p>
-            <h2>Welcome, Turjo 👋</h2>
+            <h2>Welcome, {{ Auth::user()->name }} 👋</h2>
             <p>Here's an overview of your trips</p>
         </div>
-        <a href="#" class="btn btn-orange px-4 py-2 mt-2">
+        <a href="{{ route('trips.create') }}" class="btn btn-orange px-4 py-2 mt-2">
             <i class="ti ti-plus me-1"></i> New Trip
         </a>
     </div>
@@ -258,7 +258,7 @@
     {{-- Trip List --}}
     <div class="section-header">
         <h5>Your trips</h5>
-        <a href="#" style="font-size:13px; color:#EF9F27; text-decoration:none;">View all</a>
+        <a href="{{ route('trips.index') }}" style="font-size:13px; color:#EF9F27; text-decoration:none;">View all</a>
     </div>
 
     @forelse($trips as $trip)
@@ -279,8 +279,12 @@
                     <span class="badge badge-completed">Completed</span>
                 @endif
                 <div class="trip-budget">৳{{ number_format($trip->budget) }}</div>
-                <button class="icon-btn"><i class="ti ti-edit"></i></button>
-                <button class="icon-btn"><i class="ti ti-trash"></i></button>
+                <a href="{{ route('trips.edit', $trip) }}" class="icon-btn"><i class="ti ti-edit"></i></a>
+                <form method="POST" action="{{ route('trips.destroy', $trip) }}" style="display:inline;">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="icon-btn" onclick="return confirm('Delete this trip?')"><i class="ti ti-trash"></i></button>
+                </form>
             </div>
         </div>
     @empty

@@ -161,22 +161,22 @@
     {{-- Stats --}}
     <div class="stats-box">
         <div class="stat">
-            <div class="stat-val">24</div>
+            <div class="stat-val">{{ $totalUsers }}</div>
             <div class="stat-label">Total users</div>
         </div>
         <div class="stat-divider"></div>
         <div class="stat">
-            <div class="stat-val">87</div>
+            <div class="stat-val">{{ $totalTrips }}</div>
             <div class="stat-label">Total trips</div>
         </div>
         <div class="stat-divider"></div>
         <div class="stat">
-            <div class="stat-val">12</div>
-            <div class="stat-label">Active this month</div>
+            <div class="stat-val">{{ $activeThisMonth }}</div>
+            <div class="stat-label">New this month</div>
         </div>
         <div class="stat-divider"></div>
         <div class="stat">
-            <div class="stat-val">3</div>
+            <div class="stat-val">{{ $totalAnnouncements }}</div>
             <div class="stat-label">Announcements</div>
         </div>
     </div>
@@ -184,7 +184,7 @@
     {{-- Recent Users --}}
     <div class="section-header">
         <h5>Recent users</h5>
-        <a href="#" style="font-size:13px; color:#EF9F27; text-decoration:none;">View all</a>
+        <a href="{{ route('admin.users') }}" style="font-size:13px; color:#EF9F27; text-decoration:none;">View all</a>
     </div>
     <div class="admin-table mb-4">
         <table>
@@ -198,27 +198,21 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Rahim Uddin</td>
-                    <td>rahim@email.com</td>
-                    <td>6</td>
-                    <td><span class="badge badge-active">Active</span></td>
-                    <td>May 20, 2026</td>
-                </tr>
-                <tr>
-                    <td>Karim Hossain</td>
-                    <td>karim@email.com</td>
-                    <td>3</td>
-                    <td><span class="badge badge-active">Active</span></td>
-                    <td>May 25, 2026</td>
-                </tr>
-                <tr>
-                    <td>Nadia Islam</td>
-                    <td>nadia@email.com</td>
-                    <td>1</td>
-                    <td><span class="badge badge-inactive">Inactive</span></td>
-                    <td>Jun 1, 2026</td>
-                </tr>
+                @foreach($recentUsers as $user)
+                    <tr>
+                        <td>{{ $user->name }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>{{ $user->trips->count() }}</td>
+                        <td>
+                            @if($user->is_active)
+                                <span class="badge badge-active">Active</span>
+                            @else
+                                <span class="badge badge-inactive">Inactive</span>
+                            @endif
+                        </td>
+                        <td>{{ $user->created_at->format('M d, Y') }}</td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     </div>
@@ -226,7 +220,6 @@
     {{-- Recent Trips --}}
     <div class="section-header">
         <h5>Recent trips</h5>
-        <a href="#" style="font-size:13px; color:#EF9F27; text-decoration:none;">View all</a>
     </div>
     <div class="admin-table">
         <table>
@@ -240,27 +233,17 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>Cox's Bazar Getaway</td>
-                    <td>Rahim Uddin</td>
-                    <td>Cox's Bazar</td>
-                    <td><span class="badge badge-ongoing">Ongoing</span></td>
-                    <td>৳12,000</td>
-                </tr>
-                <tr>
-                    <td>Sylhet Tea Tour</td>
-                    <td>Karim Hossain</td>
-                    <td>Sylhet</td>
-                    <td><span class="badge badge-planned">Planned</span></td>
-                    <td>৳8,500</td>
-                </tr>
-                <tr>
-                    <td>Sundarbans Day Trip</td>
-                    <td>Nadia Islam</td>
-                    <td>Khulna</td>
-                    <td><span class="badge badge-completed">Completed</span></td>
-                    <td>৳5,000</td>
-                </tr>
+                @foreach($recentTrips as $trip)
+                    <tr>
+                        <td>{{ $trip->title }}</td>
+                        <td>{{ $trip->user->name }}</td>
+                        <td>{{ $trip->destination }}</td>
+                        <td>
+                            <span class="badge badge-{{ $trip->status }}">{{ ucfirst($trip->status) }}</span>
+                        </td>
+                        <td>৳{{ number_format($trip->budget) }}</td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     </div>

@@ -97,7 +97,7 @@
     @endif
 
     <div class="form-card">
-        <form method="POST" action="#">
+        <form method="POST" action="{{ route('trips.store') }}">
             @csrf
 
             {{-- Trip Title --}}
@@ -189,7 +189,7 @@
             </div>
 
             <div class="form-actions">
-                <a href="#" class="btn btn-outline-secondary px-4">Cancel</a>
+                <a href="{{ route('trips.index') }}" class="btn btn-outline-secondary px-4">Cancel</a>
                 <button type="submit" class="btn btn-orange px-4">Create trip</button>
             </div>
 
