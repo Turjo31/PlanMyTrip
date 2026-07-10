@@ -297,7 +297,7 @@
 @endsection
 
 @section('content')
-<div class="details-wrapper">
+<div class="details-wrapper" id="tripWrapper" data-destination="{{ $trip->destination }}">
 
     {{-- Header --}}
     <div class="details-header">
@@ -361,19 +361,19 @@
                 <div class="dest-grid">
                     <div class="dest-item">
                         <div class="dest-label">Country</div>
-                        <div class="dest-val">{{ $countryInfo['name']['common'] ?? 'N/A' }}</div>
+                        <div class="dest-val">{{ $countryInfo['country'] }}</div>
                     </div>
                     <div class="dest-item">
-                        <div class="dest-label">Currency</div>
-                        <div class="dest-val">{{ implode(', ', array_keys($countryInfo['currencies'] ?? [])) }}</div>
-                    </div>
-                    <div class="dest-item">
-                        <div class="dest-label">Language</div>
-                        <div class="dest-val">{{ implode(', ', array_slice(array_values($countryInfo['languages'] ?? []), 0, 2)) }}</div>
+                        <div class="dest-label">City</div>
+                        <div class="dest-val">{{ $countryInfo['city'] }}</div>
                     </div>
                     <div class="dest-item">
                         <div class="dest-label">Timezone</div>
-                        <div class="dest-val">{{ $countryInfo['timezones'][0] ?? 'N/A' }}</div>
+                        <div class="dest-val">{{ $countryInfo['timezone'] }}</div>
+                    </div>
+                    <div class="dest-item">
+                        <div class="dest-label">Currency</div>
+                        <div class="dest-val">{{ $countryInfo['currency'] }}</div>
                     </div>
                 </div>
             @else
@@ -482,11 +482,12 @@
     @endforelse
 
 </div>
+@endsection
 
 @section('scripts')
 <script>
-    // ── Trip destination passed from Blade to JS ──
-    const destination = "{{ $trip->destination }}";
+    // ── Trip destination read from HTML data attribute to avoid encoding issues ──
+    const destination = document.getElementById('tripWrapper').dataset.destination;
 
     /**
      * Fetch live weather for the trip destination asynchronously.
@@ -568,5 +569,4 @@
         ]);
     });
 </script>
-@endsection
 @endsection

@@ -68,13 +68,70 @@ class TripController extends Controller
         $remaining = $trip->budget - $totalEstimatedCost;
         $budgetPercent = $trip->budget > 0 ? min(100, round(($totalEstimatedCost / $trip->budget) * 100)) : 0;
 
-        // Fetch country info from RestCountries API (PHP side)
+        // Fetch country info using Geoapify Geocoding API (PHP side)
         // Weather and tourist places are fetched client-side via async JavaScript
         $countryInfo = null;
         try {
-            $countryResponse = Http::get('https://restcountries.com/v3.1/name/' . urlencode($trip->destination));
-            if ($countryResponse->ok()) {
-                $countryInfo = $countryResponse->json()[0] ?? null;
+            // Simple currency map for common countries
+            $currencyMap = [
+                'Bangladesh'    => 'BDT (৳)',
+                'India'         => 'INR (₹)',
+                'Thailand'      => 'THB (฿)',
+                'Malaysia'      => 'MYR (RM)',
+                'Singapore'     => 'SGD ($)',
+                'Indonesia'     => 'IDR (Rp)',
+                'Nepal'         => 'NPR (₨)',
+                'Sri Lanka'     => 'LKR (₨)',
+                'Myanmar'       => 'MMK (K)',
+                'Vietnam'       => 'VND (₫)',
+                'Cambodia'      => 'KHR (៛)',
+                'Philippines'   => 'PHP (₱)',
+                'Japan'         => 'JPY (¥)',
+                'China'         => 'CNY (¥)',
+                'South Korea'   => 'KRW (₩)',
+                'United States' => 'USD ($)',
+                'United Kingdom'=> 'GBP (£)',
+                'France'        => 'EUR (€)',
+                'Germany'       => 'EUR (€)',
+                'Australia'     => 'AUD ($)',
+                'Canada'        => 'CAD ($)',
+                'Pakistan'      => 'PKR (₨)',
+                'Saudi Arabia'  => 'SAR (﷼)',
+                'UAE'           => 'AED (د.إ)',
+                'Turkey'        => 'TRY (₺)',
+            ];
+
+            $geoResponse = Http::get('https://api.geoapify.com/v1/geocode/search', [
+                'text'   => $trip->destination,
+                'limit'  => 1,
+                'apiKey' => env('GEOAPIFY_API_KEY'),
+            ]);
+
+            if ($geoResponse->ok() && !empty($geoResponse->json()['features'])) {
+                $props = $geoResponse->json()['features'][0]['properties'];
+
+                $country = $props['country'] ?? 'N/A';
+
+                // Format timezone as GMT offset (e.g. "Asia/Dhaka" → "GMT+6")
+                $timezone = 'N/A';
+                if (!empty($props['timezone']['name'])) {
+                    try {
+                        $tz = new \DateTimeZone($props['timezone']['name']);
+                        $offset = $tz->getOffset(new \DateTime('now', $tz));
+                        $hours = intdiv($offset, 3600);
+                        $minutes = abs(($offset % 3600) / 60);
+                        $timezone = 'GMT' . ($hours >= 0 ? '+' : '') . $hours . ($minutes > 0 ? ':' . str_pad($minutes, 2, '0', STR_PAD_LEFT) : '');
+                    } catch (\Exception $e) {
+                        $timezone = $props['timezone']['name'];
+                    }
+                }
+
+                $countryInfo = [
+                    'country'  => $country,
+                    'currency' => $currencyMap[$country] ?? 'N/A',
+                    'timezone' => $timezone,
+                    'city'     => $props['city'] ?? $props['state'] ?? 'N/A',
+                ];
             }
         } catch (\Exception $e) {
             $countryInfo = null;

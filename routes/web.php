@@ -133,9 +133,10 @@ Route::get('/api/places', function () {
     $lat = $coords[1];
 
     // Step 2: Get tourist attractions near those coordinates using Geoapify Places API
+    // Using a larger radius (10km) to catch attractions in smaller cities like Kuakata
     $placesResponse = Http::get('https://api.geoapify.com/v2/places', [
-        'categories' => 'tourism.attraction,tourism.sights',
-        'filter'     => "circle:{$lon},{$lat},5000",
+        'categories' => 'tourism.attraction,tourism.sights,tourism.attraction.artwork,natural',
+        'filter'     => "circle:{$lon},{$lat},10000",
         'limit'      => 6,
         'apiKey'     => env('GEOAPIFY_API_KEY'),
     ]);
