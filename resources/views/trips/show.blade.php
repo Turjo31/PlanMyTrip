@@ -73,22 +73,26 @@
     .tourist-place {
         background: #f5f0e8;
         border-radius: 8px;
-        padding: 10px 12px;
+        padding: 12px 14px;
         font-size: 13px;
+        border-left: 3px solid #EF9F27;
     }
 
     .tourist-place .place-name {
-        font-weight: 500;
+        font-weight: 600;
         color: #1a1a1a;
-        margin-bottom: 2px;
-        font-size: 13px;
+        margin-bottom: 4px;
+        font-size: 14px;
     }
 
     .tourist-place .place-kind {
         font-size: 11px;
-        color: #aaa;
+        color: #999;
         text-transform: capitalize;
     }
+
+    /* ── Info Row ── */
+    .info-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 12px;
@@ -132,14 +136,15 @@
     }
 
     .weather-city {
-        font-size: 15px;
-        font-weight: 500;
+        font-size: 16px;
+        font-weight: 600;
         color: #1a1a1a;
     }
 
     .weather-desc {
         font-size: 13px;
-        color: #aaa;
+        color: #888;
+        margin-top: 2px;
     }
 
     .weather-temp {
@@ -152,18 +157,26 @@
     .dest-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 10px;
+        gap: 14px;
+    }
+
+    .dest-item {
+        padding: 10px 12px;
+        background: #f5f0e8;
+        border-radius: 8px;
     }
 
     .dest-item .dest-label {
         font-size: 11px;
-        color: #aaa;
-        margin-bottom: 2px;
+        color: #999;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
 
     .dest-item .dest-val {
-        font-size: 14px;
-        font-weight: 500;
+        font-size: 15px;
+        font-weight: 600;
         color: #1a1a1a;
     }
 

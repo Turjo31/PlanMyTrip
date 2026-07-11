@@ -74,7 +74,12 @@
             font-size: 13px;
         }
 
-        /* ── Cards / Sections ── */
+        /* ── Forms ── */
+        .form-control::placeholder,
+        .form-select::placeholder {
+            color: #c5bdb0;
+            font-weight: 400;
+        }
         .card {
             border: 1px solid #e0d9ce;
             border-radius: 12px;

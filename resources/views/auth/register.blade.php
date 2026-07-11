@@ -48,7 +48,9 @@
         padding: 10px 14px;
         color: #1a1a1a;
     }
-
+    .form-control::placeholder {
+        color: #c5bdb0;
+    }
     .form-control:focus {
         background: #f5f0e8;
         border-color: #EF9F27;
