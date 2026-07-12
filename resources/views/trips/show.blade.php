@@ -71,10 +71,11 @@
     }
 
     .tourist-place {
-        background: #f5f0e8;
+        background: #fff;
         border-radius: 8px;
         padding: 12px 14px;
         font-size: 13px;
+        border: 1px solid #e0d9ce;
         border-left: 3px solid #EF9F27;
     }
 
@@ -157,21 +158,24 @@
     .dest-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 14px;
+        gap: 10px;
     }
 
     .dest-item {
-        padding: 10px 12px;
-        background: #f5f0e8;
+        padding: 10px 14px;
+        background: #fff;
         border-radius: 8px;
+        border: 1px solid #e0d9ce;
+        border-left: 3px solid #EF9F27;
     }
 
     .dest-item .dest-label {
-        font-size: 11px;
-        color: #999;
+        font-size: 10px;
+        color: #EF9F27;
         margin-bottom: 4px;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
+        letter-spacing: 1px;
+        font-weight: 600;
     }
 
     .dest-item .dest-val {
