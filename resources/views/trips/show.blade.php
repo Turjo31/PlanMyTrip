@@ -349,10 +349,6 @@
         </div>
     </div>
 
-    {{-- Success message --}}
-    @if(session('success'))
-        <div class="alert alert-success mb-3" style="font-size:13px; border-radius:8px;">{{ session('success') }}</div>
-    @endif
 
     {{-- Info Row: Weather + Destination --}}
     <div class="info-row">

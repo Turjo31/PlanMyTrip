@@ -209,6 +209,21 @@
     </nav>
 
     {{-- Page Content --}}
+    {{-- Global flash messages shown after any action --}}
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show mb-0 rounded-0" role="alert" style="font-size:13px; background:#EAF3DE; color:#3B6D11; border:none; border-bottom: 1px solid #c3e6a0; padding: 12px 2rem;">
+            <i class="ti ti-circle-check me-2"></i> {{ session('success') }}
+            <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" style="font-size:11px;"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show mb-0 rounded-0" role="alert" style="font-size:13px; background:#f5e6e6; color:#a94442; border:none; border-bottom: 1px solid #f0c0c0; padding: 12px 2rem;">
+            <i class="ti ti-alert-circle me-2"></i> {{ session('error') }}
+            <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" style="font-size:11px;"></button>
+        </div>
+    @endif
+
     @yield('content')
 
     {{-- Footer --}}
