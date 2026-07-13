@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Http\Controllers\ActivityController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -61,6 +62,9 @@ class AuthController extends Controller
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $request->session()->regenerate();
 
+            // Track login time via session and cookie
+            ActivityController::trackLogin();
+
             // Redirect admin to admin dashboard
             if (Auth::user()->isAdmin()) {
                 return redirect()->route('admin.dashboard');
@@ -75,6 +79,9 @@ class AuthController extends Controller
     // Handle logout
     public function logout(Request $request)
     {
+        // Clear activity session data before logout
+        ActivityController::clearSession();
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

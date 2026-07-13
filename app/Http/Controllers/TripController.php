@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Trip;
+use App\Http\Controllers\ActivityController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -227,6 +228,9 @@ class TripController extends Controller
             }
         }
 
+        // Get last login time from session or cookie
+        $lastLogin = ActivityController::getLastLogin();
+
         return view('dashboard', compact(
             'trips',
             'totalTrips',
@@ -235,7 +239,8 @@ class TripController extends Controller
             'weatherTrip',
             'weatherTemp',
             'weatherDesc',
-            'weatherIcon'
+            'weatherIcon',
+            'lastLogin'
         ));
     }
 }
