@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Trip;
 use App\Http\Controllers\ActivityController;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
@@ -190,6 +191,79 @@ class TripController extends Controller
         $trip->delete();
 
         return redirect()->route('trips.index')->with('success', 'Trip deleted successfully!');
+    }
+
+    // Generate and download trip summary as PDF
+    public function downloadPdf(Trip $trip)
+    {
+        // Make sure user owns this trip
+        if ($trip->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $places = $trip->places;
+        $totalEstimatedCost = $places->sum('estimated_cost');
+        $remaining = $trip->budget - $totalEstimatedCost;
+        $budgetPercent = $trip->budget > 0 ? min(100, round(($totalEstimatedCost / $trip->budget) * 100)) : 0;
+
+        // Fetch country info for PDF
+        $countryInfo = null;
+        try {
+            $geoResponse = Http::get('https://api.geoapify.com/v1/geocode/search', [
+                'text'   => $trip->destination,
+                'limit'  => 1,
+                'apiKey' => env('GEOAPIFY_API_KEY'),
+            ]);
+
+            if ($geoResponse->ok() && !empty($geoResponse->json()['features'])) {
+                $props = $geoResponse->json()['features'][0]['properties'];
+                $country = $props['country'] ?? 'N/A';
+
+                $currencyMap = [
+                    'Bangladesh' => 'BDT (৳)', 'India' => 'INR (₹)',
+                    'Thailand'   => 'THB (฿)', 'Malaysia' => 'MYR (RM)',
+                    'Singapore'  => 'SGD ($)', 'Indonesia' => 'IDR (Rp)',
+                    'Nepal'      => 'NPR (₨)', 'Sri Lanka' => 'LKR (₨)',
+                    'France'     => 'EUR (€)', 'Germany' => 'EUR (€)',
+                    'Japan'      => 'JPY (¥)', 'China' => 'CNY (¥)',
+                ];
+
+                $timezone = 'N/A';
+                if (!empty($props['timezone']['name'])) {
+                    try {
+                        $tz = new \DateTimeZone($props['timezone']['name']);
+                        $offset = $tz->getOffset(new \DateTime('now', $tz));
+                        $hours = intdiv($offset, 3600);
+                        $minutes = abs(($offset % 3600) / 60);
+                        $timezone = 'GMT' . ($hours >= 0 ? '+' : '') . $hours . ($minutes > 0 ? ':' . str_pad($minutes, 2, '0', STR_PAD_LEFT) : '');
+                    } catch (\Exception $e) {
+                        $timezone = $props['timezone']['name'];
+                    }
+                }
+
+                $countryInfo = [
+                    'country'  => $country,
+                    'currency' => $currencyMap[$country] ?? 'N/A',
+                    'timezone' => $timezone,
+                    'city'     => $props['city'] ?? $props['state'] ?? 'N/A',
+                ];
+            }
+        } catch (\Exception $e) {
+            $countryInfo = null;
+        }
+
+        // Generate PDF from blade view
+        $pdf = Pdf::loadView('trips.pdf', compact(
+            'trip',
+            'places',
+            'totalEstimatedCost',
+            'remaining',
+            'budgetPercent',
+            'countryInfo'
+        ));
+
+        // Download with a clean filename
+        return $pdf->download(str()->slug($trip->title) . '-trip-summary.pdf');
     }
 
     // Dashboard

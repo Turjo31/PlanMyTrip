@@ -46,6 +46,9 @@ Route::middleware('auth')->group(function () {
     // Trips
     Route::resource('trips', TripController::class);
 
+    // Download trip summary as PDF
+    Route::get('/trips/{trip}/pdf', [TripController::class, 'downloadPdf'])->name('trips.pdf');
+
     // Places (nested under trips)
     Route::post('/trips/{trip}/places', [PlaceController::class, 'store'])->name('places.store');
     Route::put('/trips/{trip}/places/{place}', [PlaceController::class, 'update'])->name('places.update');

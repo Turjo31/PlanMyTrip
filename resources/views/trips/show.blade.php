@@ -336,6 +336,9 @@
             </div>
         </div>
         <div class="d-flex gap-2 mt-2">
+            <a href="{{ route('trips.pdf', $trip) }}" class="btn btn-outline-secondary btn-sm px-3">
+                <i class="ti ti-file-download me-1"></i> Download PDF
+            </a>
             <a href="{{ route('trips.edit', $trip) }}" class="btn btn-outline-secondary btn-sm px-3">
                 <i class="ti ti-edit me-1"></i> Edit
             </a>
@@ -349,6 +352,10 @@
         </div>
     </div>
 
+    {{-- Success message --}}
+    @if(session('success'))
+        <div class="alert alert-success mb-3" style="font-size:13px; border-radius:8px;">{{ session('success') }}</div>
+    @endif
 
     {{-- Info Row: Weather + Destination --}}
     <div class="info-row">
