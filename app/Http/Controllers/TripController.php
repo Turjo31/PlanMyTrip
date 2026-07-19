@@ -209,7 +209,7 @@ class TripController extends Controller
         // Fetch country info for PDF
         $countryInfo = null;
         try {
-            $geoResponse = Http::get('https://api.geoapify.com/v1/geocode/search', [
+            $geoResponse = \Illuminate\Support\Facades\Http::get('https://api.geoapify.com/v1/geocode/search', [
                 'text'   => $trip->destination,
                 'limit'  => 1,
                 'apiKey' => env('GEOAPIFY_API_KEY'),
@@ -286,19 +286,35 @@ class TripController extends Controller
 
         if ($weatherTrip) {
             try {
-                $weatherResponse = Http::get('https://api.openweathermap.org/data/2.5/weather', [
-                    'q'     => $weatherTrip->destination,
-                    'appid' => env('OPENWEATHER_API_KEY'),
-                    'units' => 'metric',
+                // Step 1: Geocode destination to coordinates using Geoapify
+                $geoResponse = Http::get('https://api.geoapify.com/v1/geocode/search', [
+                    'text'   => $weatherTrip->destination,
+                    'limit'  => 1,
+                    'apiKey' => env('GEOAPIFY_API_KEY'),
                 ]);
-                if ($weatherResponse->ok()) {
-                    $data = $weatherResponse->json();
-                    $weatherTemp = round($data['main']['temp']);
-                    $weatherDesc = $data['weather'][0]['description'];
-                    $weatherIcon = str_contains($weatherDesc, 'rain') ? 'cloud-rain' : (str_contains($weatherDesc, 'cloud') ? 'cloud' : 'sun');
+
+                if ($geoResponse->ok() && !empty($geoResponse->json()['features'])) {
+                    $coords = $geoResponse->json()['features'][0]['geometry']['coordinates'];
+                    $lon    = $coords[0];
+                    $lat    = $coords[1];
+
+                    // Step 2: Fetch weather using coordinates from OpenWeatherMap
+                    $weatherResponse = Http::get('https://api.openweathermap.org/data/2.5/weather', [
+                        'lat'   => $lat,
+                        'lon'   => $lon,
+                        'appid' => env('OPENWEATHER_API_KEY'),
+                        'units' => 'metric',
+                    ]);
+
+                    if ($weatherResponse->ok()) {
+                        $data        = $weatherResponse->json();
+                        $weatherTemp = round($data['main']['temp']);
+                        $weatherDesc = $data['weather'][0]['description'];
+                        $weatherIcon = str_contains($weatherDesc, 'rain') ? 'cloud-rain' : (str_contains($weatherDesc, 'cloud') ? 'cloud' : 'sun');
+                    }
                 }
             } catch (\Exception $e) {
-                // silently fail
+                // silently fail — weather is non-critical
             }
         }
 
