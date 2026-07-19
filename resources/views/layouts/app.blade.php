@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" id="htmlRoot">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,41 +13,42 @@
     <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
 
     {{-- Google Fonts --}}
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet">
 
     <style>
         /* ── CSS Variables: Light Mode (default) ── */
         :root {
-            --bg:           #f5f0e8;
-            --bg-card:      #fff;
-            --bg-input:     #f5f0e8;
-            --text:         #1a1a1a;
-            --text-muted:   #888;
-            --text-light:   #aaa;
-            --border:       #e0d9ce;
-            --navbar-bg:    #fff;
-            --footer-bg:    #1a1a1a;
-            --footer-text:  #555;
-            --placeholder:  #c5bdb0;
-            --accent:       #EF9F27;
-            --accent-dark:  #d98e1f;
+            --bg: #f5f0e8;
+            --bg-card: #fff;
+            --bg-input: #f5f0e8;
+            --text: #1a1a1a;
+            --text-muted: #888;
+            --text-light: #aaa;
+            --border: #e0d9ce;
+            --navbar-bg: #fff;
+            --footer-bg: #1a1a1a;
+            --footer-text: #555;
+            --placeholder: #c5bdb0;
+            --accent: #EF9F27;
+            --accent-dark: #d98e1f;
         }
 
         /* ── CSS Variables: Dark Mode ── */
         .dark-mode {
-            --bg:           #0f1117;
-            --bg-card:      #1a1d26;
-            --bg-input:     #13151e;
-            --text:         #e8e3d9;
-            --text-muted:   #888;
-            --text-light:   #666;
-            --border:       #2a2d36;
-            --navbar-bg:    #13151e;
-            --footer-bg:    #0a0b10;
-            --footer-text:  #444;
-            --placeholder:  #444;
-            --accent:       #EF9F27;
-            --accent-dark:  #d98e1f;
+            --bg: #0f1117;
+            --bg-card: #1a1d26;
+            --bg-input: #13151e;
+            --text: #e8e3d9;
+            --text-muted: #888;
+            --text-light: #666;
+            --border: #2a2d36;
+            --navbar-bg: #13151e;
+            --footer-bg: #0a0b10;
+            --footer-text: #444;
+            --placeholder: #444;
+            --accent: #EF9F27;
+            --accent-dark: #d98e1f;
         }
 
         /* ── Base ── */
@@ -57,7 +59,10 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        h1, h2, h3, .display-font {
+        h1,
+        h2,
+        h3,
+        .display-font {
             font-family: 'Bebas Neue', sans-serif;
             letter-spacing: 1px;
             color: var(--text);
@@ -87,7 +92,8 @@
             font-size: 14px;
         }
 
-        .nav-link:hover, .nav-link.active {
+        .nav-link:hover,
+        .nav-link.active {
             color: var(--text) !important;
         }
 
@@ -135,13 +141,15 @@
         }
 
         /* ── Forms ── */
-        .form-control, .form-select {
+        .form-control,
+        .form-select {
             background-color: var(--bg-input) !important;
             border-color: var(--border) !important;
             color: var(--text) !important;
         }
 
-        .form-control:focus, .form-select:focus {
+        .form-control:focus,
+        .form-select:focus {
             border-color: var(--accent) !important;
             box-shadow: 0 0 0 3px rgba(239, 159, 39, 0.15) !important;
         }
@@ -153,7 +161,15 @@
         }
 
         /* ── Cards ── */
-        .card, .info-card, .ann-item, .post-card, .trip-card, .form-card, .admin-table, .stats-box, .auth-card {
+        .card,
+        .info-card,
+        .ann-item,
+        .post-card,
+        .trip-card,
+        .form-card,
+        .admin-table,
+        .stats-box,
+        .auth-card {
             background-color: var(--bg-card) !important;
             border-color: var(--border) !important;
             color: var(--text) !important;
@@ -203,13 +219,23 @@
         }
 
         /* ── Borders and dividers ── */
-        .trip-row, .place-row, .ann-item {
+        .trip-row,
+        .place-row,
+        .ann-item {
             border-color: var(--border) !important;
         }
 
         /* ── Text colors ── */
-        .text-muted, .trip-meta, .post-date, .ann-date, .weather-desc,
-        .budget-note, .form-text, .stat-label, .dest-label, .place-kind {
+        .text-muted,
+        .trip-meta,
+        .post-date,
+        .ann-date,
+        .weather-desc,
+        .budget-note,
+        .form-text,
+        .stat-label,
+        .dest-label,
+        .place-kind {
             color: var(--text-muted) !important;
         }
 
@@ -240,7 +266,38 @@
             color: var(--accent);
         }
 
-        /* ── Dark mode overrides for hardcoded colors ── */
+        /* ── Dark mode: landing page fixes ── */
+        .dark-mode .hero h1,
+        .dark-mode .hero h1 span,
+        .dark-mode .section-title,
+        .dark-mode .hero-label,
+        .dark-mode .hero p,
+        .dark-mode .hero-stats .stat-val,
+        .dark-mode .hero-stats .stat-label {
+            color: var(--text) !important;
+        }
+
+        .dark-mode .hero h1 span {
+            color: var(--accent) !important;
+        }
+
+        .dark-mode .features-section {
+            background: var(--bg-card) !important;
+            border-color: var(--border) !important;
+        }
+
+        .dark-mode .hero-stats {
+            border-top-color: var(--border) !important;
+        }
+
+        .dark-mode .feature-box h6 {
+            color: var(--text) !important;
+        }
+
+        .dark-mode .feature-box p {
+            color: var(--text-muted) !important;
+        }
+
         .dark-mode .stat-val,
         .dark-mode .trip-name,
         .dark-mode .trip-budget,
@@ -284,6 +341,18 @@
             color: var(--text-muted) !important;
         }
 
+        .dark-mode .feature-box {
+            background: var(--bg-card) !important;
+        }
+
+        .dark-mode .feature-box h6 {
+            color: var(--text) !important;
+        }
+
+        .dark-mode .feature-box p {
+            color: var(--text-muted) !important;
+        }
+
         .dark-mode .stat-divider {
             background: var(--border) !important;
         }
@@ -309,7 +378,8 @@
         }
 
         /* ── Tourist place and dest-item boxes ── */
-        .tourist-place, .dest-item {
+        .tourist-place,
+        .dest-item {
             background-color: var(--bg) !important;
             border-color: var(--border) !important;
         }
@@ -325,6 +395,7 @@
         }
     </script>
 </head>
+
 <body>
 
     {{-- Navbar --}}
@@ -341,26 +412,37 @@
                     @auth
                         @if(Auth::user()->isAdmin())
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->is('admin') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">Dashboard</a>
+                                <a class="nav-link {{ request()->is('admin') ? 'active' : '' }}"
+                                    href="{{ route('admin.dashboard') }}">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}" href="{{ route('admin.users') }}">Users</a>
+                                <a class="nav-link {{ request()->is('admin/users*') ? 'active' : '' }}"
+                                    href="{{ route('admin.users') }}">Users</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->is('admin/announcements*') ? 'active' : '' }}" href="{{ route('admin.announcements') }}">Announcements</a>
+                                <a class="nav-link {{ request()->is('admin/announcements*') ? 'active' : '' }}"
+                                    href="{{ route('admin.announcements') }}">Announcements</a>
                             </li>
                         @else
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">Dashboard</a>
+                                <a class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}"
+                                    href="{{ route('dashboard') }}">Dashboard</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->is('trips*') ? 'active' : '' }}" href="{{ route('trips.index') }}">My Trips</a>
+                                <a class="nav-link {{ request()->is('trips*') ? 'active' : '' }}"
+                                    href="{{ route('trips.index') }}">My Trips</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->is('community*') ? 'active' : '' }}" href="{{ route('community.index') }}">Community</a>
+                                <a class="nav-link {{ request()->is('community*') ? 'active' : '' }}"
+                                    href="{{ route('community.index') }}">Community</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link {{ request()->is('announcements*') ? 'active' : '' }}" href="{{ route('announcements.index') }}">Announcements</a>
+                                <a class="nav-link {{ request()->is('announcements*') ? 'active' : '' }}"
+                                    href="{{ route('announcements.index') }}">Announcements</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {{ request()->is('about') ? 'active' : '' }}"
+                                    href="{{ route('about') }}">About</a>
                             </li>
                         @endif
                     @else
@@ -368,10 +450,16 @@
                             <a class="nav-link {{ request()->is('/') ? 'active' : '' }}" href="{{ route('home') }}">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->is('community*') ? 'active' : '' }}" href="{{ route('community.index') }}">Community</a>
+                            <a class="nav-link {{ request()->is('community*') ? 'active' : '' }}"
+                                href="{{ route('community.index') }}">Community</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->is('announcements*') ? 'active' : '' }}" href="{{ route('announcements.index') }}">Announcements</a>
+                            <a class="nav-link {{ request()->is('announcements*') ? 'active' : '' }}"
+                                href="{{ route('announcements.index') }}">Announcements</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {{ request()->is('about') ? 'active' : '' }}"
+                                href="{{ route('about') }}">About</a>
                         </li>
                     @endauth
                 </ul>
@@ -383,7 +471,8 @@
                     </button>
 
                     @auth
-                        <span class="nav-link" style="font-size:14px; color:var(--text-muted);">Hi, {{ Auth::user()->name }}</span>
+                        <span class="nav-link" style="font-size:14px; color:var(--text-muted);">Hi,
+                            {{ Auth::user()->name }}</span>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
                             <button type="submit" class="btn btn-sm btn-outline-secondary">Logout</button>
@@ -399,14 +488,16 @@
 
     {{-- Global flash messages --}}
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show mb-0 rounded-0" role="alert" style="font-size:13px; background:#EAF3DE; color:#3B6D11; border:none; border-bottom: 1px solid #c3e6a0; padding: 12px 2rem;">
+        <div class="alert alert-success alert-dismissible fade show mb-0 rounded-0" role="alert"
+            style="font-size:13px; background:#EAF3DE; color:#3B6D11; border:none; border-bottom: 1px solid #c3e6a0; padding: 12px 2rem;">
             <i class="ti ti-circle-check me-2"></i> {{ session('success') }}
             <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" style="font-size:11px;"></button>
         </div>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show mb-0 rounded-0" role="alert" style="font-size:13px; background:#f5e6e6; color:#a94442; border:none; border-bottom: 1px solid #f0c0c0; padding: 12px 2rem;">
+        <div class="alert alert-danger alert-dismissible fade show mb-0 rounded-0" role="alert"
+            style="font-size:13px; background:#f5e6e6; color:#a94442; border:none; border-bottom: 1px solid #f0c0c0; padding: 12px 2rem;">
             <i class="ti ti-alert-circle me-2"></i> {{ session('error') }}
             <button type="button" class="btn-close btn-close-sm" data-bs-dismiss="alert" style="font-size:11px;"></button>
         </div>
@@ -423,8 +514,10 @@
                 <a href="{{ route('home') }}">Home</a>
                 <a href="{{ route('community.index') }}">Community</a>
                 <a href="{{ route('announcements.index') }}">Announcements</a>
+                <a href="{{ route('about') }}">About</a>
             </div>
-            <small style="font-size:12px; color:var(--footer-text);">© {{ date('Y') }} PlanMyTrip. All rights reserved.</small>
+            <small style="font-size:12px; color:var(--footer-text);">© {{ date('Y') }} PlanMyTrip. All rights
+                reserved.</small>
         </div>
     </footer>
 
@@ -434,8 +527,8 @@
     <script>
         // ── Dark mode toggle logic ──
         const toggle = document.getElementById('darkToggle');
-        const icon   = document.getElementById('darkIcon');
-        const html   = document.documentElement;
+        const icon = document.getElementById('darkIcon');
+        const html = document.documentElement;
 
         // Set correct icon on page load based on saved preference
         function updateIcon() {
@@ -458,4 +551,5 @@
 
     @yield('scripts')
 </body>
+
 </html>

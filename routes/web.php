@@ -20,6 +20,11 @@ Route::get('/', function () {
 // Community feed (public)
 Route::get('/community', [PostController::class, 'index'])->name('community.index');
 
+// About page (public)
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+
 // Announcements (public)
 Route::get('/announcements', [AnnouncementController::class, 'index'])->name('announcements.index');
 

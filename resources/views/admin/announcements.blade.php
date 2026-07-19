@@ -240,11 +240,11 @@
 
 </div>
 @endsection
-                </form>
+                {{-- </form>
             </div>
         </div>
         <div class="ann-date">May 20, 2026</div>
     </div>
 
 </div>
-@endsection
+@endsection --}}
