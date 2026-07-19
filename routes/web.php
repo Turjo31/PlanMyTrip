@@ -86,86 +86,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
 
 });
 
+use App\Http\Controllers\WeatherController;
+
 // ── Internal JSON API Routes (called by async JavaScript) ──
 
-// Returns live weather data for a given city
-Route::get('/api/weather', function () {
-    $city = request('city');
+// Returns live weather data for a given city (geocode → coordinates → weather)
+Route::get('/api/weather', [WeatherController::class, 'getWeather'])->name('api.weather');
 
-    if (!$city) {
-        return response()->json(['error' => 'City is required'], 400);
-    }
-
-    $response = Http::get('https://api.openweathermap.org/data/2.5/weather', [
-        'q'     => $city,
-        'appid' => env('OPENWEATHER_API_KEY'),
-        'units' => 'metric',
-    ]);
-
-    if ($response->failed()) {
-        return response()->json(['error' => 'Weather data not found'], 404);
-    }
-
-    $data = $response->json();
-
-    return response()->json([
-        'temp'      => round($data['main']['temp']),
-        'feels_like'=> round($data['main']['feels_like']),
-        'desc'      => ucfirst($data['weather'][0]['description']),
-        'humidity'  => $data['main']['humidity'],
-        'icon'      => $data['weather'][0]['main'],
-    ]);
-})->name('api.weather');
-
-// Returns tourist attractions for a given city using Geoapify Places API
-Route::get('/api/places', function () {
-    $city = request('city');
-
-    if (!$city) {
-        return response()->json(['error' => 'City is required'], 400);
-    }
-
-    // Step 1: Get coordinates for the city using Geoapify Geocoding API
-    $geoResponse = Http::get('https://api.geoapify.com/v1/geocode/search', [
-        'text'   => $city,
-        'limit'  => 1,
-        'apiKey' => env('GEOAPIFY_API_KEY'),
-    ]);
-
-    if ($geoResponse->failed() || empty($geoResponse->json()['features'])) {
-        return response()->json(['error' => 'City not found'], 404);
-    }
-
-    $coords = $geoResponse->json()['features'][0]['geometry']['coordinates'];
-    $lon = $coords[0];
-    $lat = $coords[1];
-
-    // Step 2: Get tourist attractions near those coordinates using Geoapify Places API
-    // Using a larger radius (10km) to catch attractions in smaller cities like Kuakata
-    $placesResponse = Http::get('https://api.geoapify.com/v2/places', [
-        'categories' => 'tourism.attraction,tourism.sights,tourism.attraction.artwork,natural',
-        'filter'     => "circle:{$lon},{$lat},10000",
-        'limit'      => 6,
-        'apiKey'     => env('GEOAPIFY_API_KEY'),
-    ]);
-
-    if ($placesResponse->failed()) {
-        return response()->json(['error' => 'Places not found'], 404);
-    }
-
-    // Extract only the name and category from each place
-    $places = collect($placesResponse->json()['features'])
-        ->map(function ($place) {
-            $props = $place['properties'];
-            $category = explode('.', $props['categories'][0] ?? 'tourism');
-            return [
-                'name'     => $props['name'] ?? 'Unknown place',
-                'category' => ucfirst(end($category)),
-                'address'  => $props['address_line2'] ?? '',
-            ];
-        })
-        ->filter(fn($p) => $p['name'] !== 'Unknown place')
-        ->values();
-
-    return response()->json($places);
-})->name('api.places');
+// Returns tourist attractions for a given city (geocode → coordinates → places)
+Route::get('/api/places', [WeatherController::class, 'getPlaces'])->name('api.places');
