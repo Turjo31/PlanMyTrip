@@ -113,16 +113,16 @@ Visit `http://localhost:8000`
 
 ## Developer
 
-Name: Sabyasachi Sadhu Turjo
-Roll: 2207093
-Department: Computer Science and Engineering, KUET
-Email: ssturjo.2003@gmail.com
-GitHub: https://github.com/Turjo31
+Name: Sabyasachi Sadhu Turjo  
+Roll: 2207093  
+Department: Computer Science and Engineering, KUET  
+Email: ssturjo.2003@gmail.com  
+GitHub: https://github.com/Turjo31  
 
 ---
 
 ## Course
 
-Web Programming Lab
-CSE 3rd Year, 1st Semester
+Web Programming Lab  
+CSE 3rd Year, 1st Semester  
 Khulna University of Engineering and Technology
