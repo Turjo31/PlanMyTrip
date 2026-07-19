@@ -209,7 +209,7 @@ class TripController extends Controller
         // Fetch country info for PDF
         $countryInfo = null;
         try {
-            $geoResponse = \Illuminate\Support\Facades\Http::get('https://api.geoapify.com/v1/geocode/search', [
+            $geoResponse = Http::get('https://api.geoapify.com/v1/geocode/search', [
                 'text'   => $trip->destination,
                 'limit'  => 1,
                 'apiKey' => env('GEOAPIFY_API_KEY'),
